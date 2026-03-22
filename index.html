@@ -14,12 +14,11 @@ body{
 
 /* 상단 */
 .header{
-  text-align:left;
+  display:flex;
+  justify-content:space-between;
   padding:20px;
   font-size:22px;
   font-weight:bold;
-  display:flex;
-  justify-content:space-between;
 }
 
 /* 카드 */
@@ -40,7 +39,7 @@ body{
   margin:0 auto 20px;
 }
 
-/* 정보 + QR */
+/* 정보 */
 .row{
   display:flex;
   justify-content:space-between;
@@ -48,17 +47,35 @@ body{
 }
 
 .info{
-  font-size:16px;
+  flex:1;
 }
 
+/* 🔥 글씨 스타일 */
+#name{
+  font-size:20px;
+  font-weight:bold;
+  margin-bottom:5px;
+}
+
+#birth{
+  font-size:14px;
+  color:#555;
+}
+
+#addr{
+  font-size:14px;
+  color:#555;
+}
+
+/* QR */
 .qr{
   width:110px;
 }
 
 /* 타이머 */
 .timer{
+  padding:0 20px;
   text-align:center;
-  margin-top:20px;
 }
 
 .bar{
@@ -127,10 +144,8 @@ input{
 
 <div class="card">
 
-  <!-- 사진 -->
   <img id="photo" class="photo">
 
-  <!-- 정보 + QR -->
   <div class="row">
     <div class="info">
       <div id="name">홍길동</div>
@@ -141,14 +156,14 @@ input{
     <img id="qr" class="qr">
   </div>
 
-  <!-- 시간 -->
-  <div class="timer">
-    남은시간 <span id="time">30</span>초
-    <div class="bar">
-      <div class="fill" id="bar"></div>
-    </div>
-  </div>
+</div>
 
+<!-- 🔥 타이머 위치 (버튼 위) -->
+<div class="timer">
+  남은시간 <span id="time">30</span>초
+  <div class="bar">
+    <div class="fill" id="bar"></div>
+  </div>
 </div>
 
 <div class="bottom">
@@ -163,7 +178,6 @@ input{
   <input id="inputBirth" placeholder="생년월일">
   <input id="inputBack" placeholder="뒷자리">
   <input id="inputAddr" placeholder="주소">
-
   <input type="file" id="file">
 
   <button onclick="save()">저장</button>
@@ -186,12 +200,11 @@ function timer(){
 }
 timer();
 
-/* QR 생성 */
+/* QR */
 function makeQR(){
   let data=name.innerText + birth.innerText;
   qr.src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data="+data;
 }
-makeQR();
 
 /* 토글 */
 toggle.onclick=function(){
@@ -210,7 +223,7 @@ toggle.onclick=function(){
   }
 };
 
-/* 5번 클릭 */
+/* 5번 클릭 설정 */
 menu.onclick=function(){
   clickCount++;
   if(clickCount>=5){
@@ -231,7 +244,6 @@ function save(){
   addr.innerText=inputAddr.value;
 
   makeQR();
-
   setting.classList.remove("active");
 }
 
@@ -245,7 +257,7 @@ file.onchange=function(e){
   reader.readAsDataURL(e.target.files[0]);
 };
 
-/* 불러오기 */
+/* 🔥 저장된 값 유지 (핵심) */
 window.onload=function(){
   if(localStorage.name){
     name.innerText=localStorage.name;
@@ -257,7 +269,7 @@ window.onload=function(){
     photo.src=localStorage.photo;
   }
 
-  makeQR(); // 🔥 이거 중요 (QR 깨짐 해결)
+  makeQR(); // QR 유지 핵심
 };
 </script>
 
