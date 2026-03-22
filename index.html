@@ -50,21 +50,16 @@ body{
   flex:1;
 }
 
-/* 🔥 글씨 스타일 */
+/* 글씨 */
 #name{
-  font-size:20px;
+  font-size:22px;
   font-weight:bold;
   margin-bottom:5px;
 }
 
-#birth{
-  font-size:14px;
-  color:#555;
-}
-
-#addr{
-  font-size:14px;
-  color:#555;
+#birth, #addr{
+  font-size:13px;
+  color:#666;
 }
 
 /* QR */
@@ -158,7 +153,7 @@ input{
 
 </div>
 
-<!-- 🔥 타이머 위치 (버튼 위) -->
+<!-- 타이머 -->
 <div class="timer">
   남은시간 <span id="time">30</span>초
   <div class="bar">
@@ -185,8 +180,7 @@ input{
 
 <script>
 let count=30;
-let hidden=false;
-let clickCount=0;
+let showDetail=false; // 🔥 핵심: true면 상세
 
 /* 타이머 */
 function timer(){
@@ -206,24 +200,31 @@ function makeQR(){
   qr.src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data="+data;
 }
 
-/* 토글 */
+/* 🔥 버튼 (완전히 수정됨) */
 toggle.onclick=function(){
-  hidden=!hidden;
 
-  if(hidden){
-    birth.innerText="•••••• - •••••••";
-    addr.innerText="••••••";
+  showDetail = !showDetail;
+
+  if(showDetail){
+    // 👉 상세정보 보여줌 (QR 숨김)
+    birth.innerText = localStorage.birth + " - " + localStorage.back;
+    addr.innerText = localStorage.addr;
+
     qr.style.display="none";
     this.innerText="QR정보 표시";
+
   }else{
-    birth.innerText=localStorage.birth+" - "+localStorage.back;
-    addr.innerText=localStorage.addr;
+    // 👉 QR 보여줌 (정보 가림)
+    birth.innerText="•••••• - •••••••";
+    addr.innerText="••••••";
+
     qr.style.display="block";
     this.innerText="상세정보 표시";
   }
 };
 
-/* 5번 클릭 설정 */
+/* 설정 5번 */
+let clickCount=0;
 menu.onclick=function(){
   clickCount++;
   if(clickCount>=5){
@@ -234,6 +235,7 @@ menu.onclick=function(){
 
 /* 저장 */
 function save(){
+
   localStorage.name=inputName.value;
   localStorage.birth=inputBirth.value;
   localStorage.back=inputBack.value;
@@ -257,8 +259,9 @@ file.onchange=function(e){
   reader.readAsDataURL(e.target.files[0]);
 };
 
-/* 🔥 저장된 값 유지 (핵심) */
+/* 불러오기 */
 window.onload=function(){
+
   if(localStorage.name){
     name.innerText=localStorage.name;
     birth.innerText=localStorage.birth+" - "+localStorage.back;
@@ -269,7 +272,11 @@ window.onload=function(){
     photo.src=localStorage.photo;
   }
 
-  makeQR(); // QR 유지 핵심
+  makeQR();
+
+  // 🔥 시작은 QR 상태
+  birth.innerText="•••••• - •••••••";
+  addr.innerText="••••••";
 };
 </script>
 
