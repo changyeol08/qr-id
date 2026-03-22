@@ -10,25 +10,37 @@ body{
   margin:0;
   font-family:-apple-system;
   background:#f2f2f7;
-  overflow:hidden;
 }
 
+/* 상단 */
 .header{
+  text-align:left;
+  padding:20px;
+  font-size:22px;
+  font-weight:bold;
   display:flex;
   justify-content:space-between;
-  padding:15px;
-  font-size:20px;
-  font-weight:bold;
 }
 
+/* 카드 */
 .card{
   background:#fff;
   margin:20px;
   border-radius:20px;
   padding:20px;
-  box-shadow:0 5px 15px rgba(0,0,0,0.1);
 }
 
+/* 사진 */
+.photo{
+  width:160px;
+  height:200px;
+  object-fit:cover;
+  border-radius:15px;
+  display:block;
+  margin:0 auto 20px;
+}
+
+/* 정보 + QR */
 .row{
   display:flex;
   justify-content:space-between;
@@ -36,42 +48,34 @@ body{
 }
 
 .info{
-  flex:1;
-}
-
-/* 사진 */
-.photo{
-  width:90px;
-  height:110px;
-  border-radius:10px;
-  object-fit:cover;
-  margin-bottom:10px;
+  font-size:16px;
 }
 
 .qr{
-  width:100px;
+  width:110px;
 }
 
+/* 타이머 */
 .timer{
   text-align:center;
-  margin-top:15px;
-  font-size:14px;
+  margin-top:20px;
 }
 
 .bar{
-  height:5px;
+  height:6px;
   background:#ddd;
   border-radius:10px;
   margin-top:5px;
 }
 
 .fill{
-  height:5px;
+  height:6px;
   background:linear-gradient(to right,#4facfe,#8e2de2);
   width:100%;
   border-radius:10px;
 }
 
+/* 버튼 */
 .bottom{
   position:fixed;
   bottom:20px;
@@ -90,7 +94,7 @@ body{
   font-weight:bold;
 }
 
-/* 설정창 */
+/* 설정 */
 .setting{
   position:fixed;
   top:0;
@@ -124,8 +128,9 @@ input{
 <div class="card">
 
   <!-- 사진 -->
-  <img id="photo" class="photo" src="" alt="">
+  <img id="photo" class="photo">
 
+  <!-- 정보 + QR -->
   <div class="row">
     <div class="info">
       <div id="name">홍길동</div>
@@ -136,6 +141,7 @@ input{
     <img id="qr" class="qr">
   </div>
 
+  <!-- 시간 -->
   <div class="timer">
     남은시간 <span id="time">30</span>초
     <div class="bar">
@@ -158,8 +164,7 @@ input{
   <input id="inputBack" placeholder="뒷자리">
   <input id="inputAddr" placeholder="주소">
 
-  <!-- 👇 사진 선택 -->
-  <input type="file" accept="image/*" id="file">
+  <input type="file" id="file">
 
   <button onclick="save()">저장</button>
 </div>
@@ -169,85 +174,78 @@ let count=30;
 let hidden=false;
 let clickCount=0;
 
+/* 타이머 */
 function timer(){
   count--;
   if(count<=0) count=30;
 
-  document.getElementById("time").innerText=count;
-  document.getElementById("bar").style.width=(count/30*100)+"%";
+  time.innerText=count;
+  bar.style.width=(count/30*100)+"%";
 
   setTimeout(timer,1000);
 }
 timer();
 
-/* QR */
+/* QR 생성 */
 function makeQR(){
-  let name=document.getElementById("name").innerText;
-  document.getElementById("qr").src=
-  "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data="+name;
+  let data=name.innerText + birth.innerText;
+  qr.src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data="+data;
 }
 makeQR();
 
-/* 상세/QR 토글 */
-document.getElementById("toggle").onclick=function(){
+/* 토글 */
+toggle.onclick=function(){
   hidden=!hidden;
 
   if(hidden){
-    document.getElementById("birth").innerText="•••••• - •••••••";
-    document.getElementById("addr").innerText="••••••";
+    birth.innerText="•••••• - •••••••";
+    addr.innerText="••••••";
+    qr.style.display="none";
     this.innerText="QR정보 표시";
   }else{
-    document.getElementById("birth").innerText=
-      localStorage.birth+" - "+localStorage.back;
-    document.getElementById("addr").innerText=localStorage.addr;
+    birth.innerText=localStorage.birth+" - "+localStorage.back;
+    addr.innerText=localStorage.addr;
+    qr.style.display="block";
     this.innerText="상세정보 표시";
   }
 };
 
-/* 5번 클릭 설정 */
-document.getElementById("menu").onclick=function(){
+/* 5번 클릭 */
+menu.onclick=function(){
   clickCount++;
   if(clickCount>=5){
-    document.getElementById("setting").classList.add("active");
+    setting.classList.add("active");
     clickCount=0;
   }
 };
 
 /* 저장 */
 function save(){
-  let name=inputName.value;
-  let birth=inputBirth.value;
-  let back=inputBack.value;
-  let addr=inputAddr.value;
+  localStorage.name=inputName.value;
+  localStorage.birth=inputBirth.value;
+  localStorage.back=inputBack.value;
+  localStorage.addr=inputAddr.value;
 
-  localStorage.name=name;
-  localStorage.birth=birth;
-  localStorage.back=back;
-  localStorage.addr=addr;
-
-  document.getElementById("name").innerText=name;
-  document.getElementById("birth").innerText=birth+" - "+back;
-  document.getElementById("addr").innerText=addr;
+  name.innerText=inputName.value;
+  birth.innerText=inputBirth.value+" - "+inputBack.value;
+  addr.innerText=inputAddr.value;
 
   makeQR();
 
-  document.getElementById("setting").classList.remove("active");
+  setting.classList.remove("active");
 }
 
-/* 👇 사진 선택 */
-document.getElementById("file").addEventListener("change", function(e){
-  let file=e.target.files[0];
+/* 사진 */
+file.onchange=function(e){
   let reader=new FileReader();
-
   reader.onload=function(){
-    document.getElementById("photo").src=reader.result;
+    photo.src=reader.result;
     localStorage.photo=reader.result;
   }
+  reader.readAsDataURL(e.target.files[0]);
+};
 
-  if(file) reader.readAsDataURL(file);
-});
-
-/* 저장된 값 불러오기 */
+/* 불러오기 */
 window.onload=function(){
   if(localStorage.name){
     name.innerText=localStorage.name;
@@ -256,9 +254,11 @@ window.onload=function(){
   }
 
   if(localStorage.photo){
-    document.getElementById("photo").src=localStorage.photo;
+    photo.src=localStorage.photo;
   }
-}
+
+  makeQR(); // 🔥 이거 중요 (QR 깨짐 해결)
+};
 </script>
 
 </body>
