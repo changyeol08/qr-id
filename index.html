@@ -14,7 +14,6 @@ body{
   font-family:sans-serif;
 }
 
-/* 상단 */
 .header{
   display:flex;
   justify-content:center;
@@ -29,7 +28,6 @@ body{
   right:15px;
 }
 
-/* 탭 */
 .tabs{
   display:flex;
   justify-content:center;
@@ -41,17 +39,15 @@ body{
   border-bottom:2px solid black;
 }
 
-/* 카드 */
 .card{
   background:#fff;
   margin:15px;
   border-radius:20px;
   padding:20px;
   position:relative;
-  min-height:420px; /* 🔥 카드 크게 */
+  min-height:420px;
 }
 
-/* 사진 */
 .photo{
   width:150px;
   height:150px;
@@ -59,22 +55,20 @@ body{
   display:block;
   margin:0 auto;
   object-fit:cover;
+  background:#ddd;
 }
 
-/* 이름 */
 .name{
   font-weight:bold;
   margin-top:15px;
 }
 
-/* QR */
 #qr{
   position:absolute;
   right:20px;
-  bottom:20px; /* 🔥 오른쪽 아래 고정 */
+  bottom:20px;
 }
 
-/* 타이머 + 버튼 묶음 */
 .bottom-area{
   margin:20px;
 }
@@ -91,7 +85,6 @@ body{
   width:100%;
 }
 
-/* 버튼 */
 .btn{
   background:#000;
   color:#fff;
@@ -101,7 +94,6 @@ body{
   margin-top:15px;
 }
 
-/* 설정 */
 #settings{
   display:none;
   padding:20px;
@@ -117,47 +109,36 @@ input{
 
 <body>
 
-<!-- 상단 -->
-<div class="header">
+<div class="header" onclick="tap()">
   정부24
   <div class="menu">≡</div>
 </div>
 
-<!-- 탭 -->
 <div class="tabs">
   <div class="active">주민등록증</div>
   <div onclick="license()">운전면허증</div>
 </div>
 
-<!-- 카드 -->
 <div class="card" id="card">
-
   <img id="img" class="photo">
 
-  <div class="name" id="name">홍길동</div>
-  <div id="dob">20000101-1234567</div>
-  <div id="addr">서울시 강남구</div>
+  <div class="name" id="name"></div>
+  <div id="dob"></div>
+  <div id="addr"></div>
 
   <div id="qr"></div>
-
 </div>
 
-<!-- 🔥 타이머 + 버튼 (카드 아래) -->
 <div class="bottom-area">
-
   <div id="time">30초</div>
 
   <div class="bar">
     <div id="bar" class="bar-inner"></div>
   </div>
 
-  <div class="btn" id="btn" onclick="toggle()">
-    QR 표시
-  </div>
-
+  <div class="btn" id="btn" onclick="toggle()">QR 표시</div>
 </div>
 
-<!-- 설정 -->
 <div id="settings">
   <div style="display:flex;justify-content:space-between">
     <h3>설정</h3>
@@ -175,16 +156,29 @@ input{
 
 <script>
 
-let savedName="홍길동";
-let savedDob1="20000101";
-let savedDob2="1234567";
-let savedAddr="서울시 강남구";
+/* 🔥 저장값 (localStorage) */
+let savedName = localStorage.getItem("name") || "홍길동";
+let savedDob1 = localStorage.getItem("dob1") || "20000101";
+let savedDob2 = localStorage.getItem("dob2") || "1234567";
+let savedAddr = localStorage.getItem("addr") || "서울시 강남구";
+let savedImg = localStorage.getItem("img") || "";
 
 let isQR=false;
 let tapCount=0;
 
+/* 초기 로드 */
+window.onload = function(){
+  document.getElementById("name").innerText = savedName;
+  document.getElementById("dob").innerText = savedDob1 + "-" + savedDob2;
+  document.getElementById("addr").innerText = savedAddr;
+
+  if(savedImg){
+    document.getElementById("img").src = savedImg;
+  }
+};
+
 /* 5번 설정 */
-document.querySelector(".header").onclick=function(){
+function tap(){
   tapCount++;
   if(tapCount===5){
     document.getElementById("card").style.display="none";
@@ -192,7 +186,7 @@ document.querySelector(".header").onclick=function(){
     document.getElementById("settings").style.display="block";
     tapCount=0;
   }
-};
+}
 
 /* 저장 */
 function save(){
@@ -201,6 +195,11 @@ function save(){
   savedDob2 = document.getElementById("setDob2").value || savedDob2;
   savedAddr = document.getElementById("setAddr").value || savedAddr;
 
+  localStorage.setItem("name", savedName);
+  localStorage.setItem("dob1", savedDob1);
+  localStorage.setItem("dob2", savedDob2);
+  localStorage.setItem("addr", savedAddr);
+
   document.getElementById("name").innerText = savedName;
   document.getElementById("dob").innerText = savedDob1+"-"+savedDob2;
   document.getElementById("addr").innerText = savedAddr;
@@ -208,8 +207,9 @@ function save(){
   const file=document.getElementById("setImg").files[0];
   if(file){
     const reader=new FileReader();
-    reader.onload=e=>{
+    reader.onload=function(e){
       document.getElementById("img").src=e.target.result;
+      localStorage.setItem("img", e.target.result); /* 🔥 사진 저장 */
     }
     reader.readAsDataURL(file);
   }
